@@ -1,0 +1,15 @@
+python-dotenv
+tiktoken
+openai
+langchain
+chromadb
+faiss-cpu
+sentence_transformers
+gradio
+gradio_client
+fastapi
+python-multipart
+aiofiles
+uvicorn[standard]
+gunicorn
+sacremoses

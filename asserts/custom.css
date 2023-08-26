@@ -1,0 +1,8 @@
+#title{text-align: center;}
+#title h1{font-size: 3em; display:inline-flex; align-items:center}
+#title a{font-size: medium; color:dimgray; text-decoration: none; margin-left: 1em;}
+
+#prompt_textbox{width: calc(100% - 160px);border-top-right-radius: 0px;border-bottom-right-radius: 0px;}
+#submit_button{position:absolute;margin-top: 11px;right: 0;margin-right: 0.8em;border-bottom-left-radius: 0px;border-top-left-radius: 0px;}
+
+#translated_text{background-color: #f4f4f4; padding: 0.2em; border-radius: 0.5em;}
