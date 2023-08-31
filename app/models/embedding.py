@@ -16,7 +16,7 @@ class EmbeddingModel(Model):
         else:
             from langchain.embeddings import HuggingFaceEmbeddings
             embeddings = HuggingFaceEmbeddings(model_name=config.EMBEDDING_MODEL_NAME, 
-                                            cache_folder=config.EMBEDDING_MODEL_CACHE_DIRECTORY)
+                                               cache_folder=config.EMBEDDING_MODEL_CACHE_DIRECTORY)
                     
         print('load_embedding_model', config.EMBEDDING_MODEL_NAME, config.EMBEDDING_MODEL_CACHE_DIRECTORY)
 

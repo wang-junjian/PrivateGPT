@@ -1,19 +1,36 @@
+import os
+import shutil
+import numpy as np
 import gradio as gr
 
-from app import main as main_module
+from app.config import Config
+from app.models.llm import LLM
+from app.models.embedding import EmbeddingModel
+from app.models.search_image import SearchImageModel
+from app.vectorstore import VectorStore
+from app.embeddings.clip_embeddings import ClipEmbeddings
 
 
-from app.ui.search_image import get_images_from_path, get_image_features
-images_dir = 'data/images'
-images_path = get_images_from_path(images_dir)
-image_features = get_image_features(images_path)
+config = Config()
+
+llm = LLM().load(config)
+embeddings = EmbeddingModel().load(config)
+
+vs_docs = VectorStore.create_with_chroma_docs(config=config, embeddings=embeddings)
+
+search_image_model = SearchImageModel()
+search_image_model.load(config)
+
+clip_embeddings = ClipEmbeddings(search_image_model)
+vs_images = VectorStore.create_with_chroma_images(config=config, embeddings=clip_embeddings)
 
 
 def knowledge_query(chatbot: gr.Chatbot, prompt: str):
     if not prompt:
         return chatbot, '', ''
     
-    result = main_module.qa({"query": prompt})
+    qa = vs_docs.get_qa(llm=llm)
+    result = qa({"query": prompt})
     
     completion = result["result"]
     chatbot.append((prompt, completion))
@@ -25,6 +42,34 @@ def knowledge_query(chatbot: gr.Chatbot, prompt: str):
     return chatbot, '', source_docs
 
 
+def _save_files(dir, files):
+    if not os.path.exists(dir):
+        os.makedirs(dir, exist_ok=True)
+
+    output_files = []
+    for file in files:
+        filename = os.path.basename(file.name)
+        source_file = file.name
+        target_file = f'{dir}/{filename}'
+        shutil.copy(source_file, target_file)
+        output_files.append(target_file)
+
+    return output_files
+
+def upload_docs(doc_files):
+    dir = 'data/upload_docs'
+    saved_files = _save_files(dir, doc_files)
+    for file in saved_files:
+        vs_docs.add_file_with_txt(file)
+
+
+def upload_images(image_files):
+    dir = 'data/upload_images'
+    saved_files = _save_files(dir, image_files)
+    for file in saved_files:
+        vs_images.add_file_with_image(file)
+
+
 def translate_zh2en(text):
     from ..models.translate import TranslateModel
     translator = TranslateModel()
@@ -33,16 +78,14 @@ def translate_zh2en(text):
 
 
 def search_image_query(search_image_textbox, search_image, is_translate):
-    import numpy as np
-
     if search_image_textbox:
         if is_translate:
             search_image_textbox = translate_zh2en(search_image_textbox)
-        from app.ui.search_image import get_images_with_similar_text
-        images = get_images_with_similar_text(search_image_textbox, image_features)
+        vector = search_image_model.get_text_features(search_image_textbox)
+        images = vs_images.similarity_search_by_vector(vector)
     elif np.any(search_image):
-        from app.ui.search_image import get_images_with_similar, get_image_feature_from_numpy
-        images = get_images_with_similar(get_image_feature_from_numpy(search_image), image_features)
+        vector = search_image_model.get_image_features_with_ndarray(search_image)
+        images = vs_images.similarity_search_by_vector(vector)
     else:
         return [], ''
 

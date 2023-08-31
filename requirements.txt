@@ -2,14 +2,29 @@ python-dotenv
 tiktoken
 openai
 langchain
-chromadb
-faiss-cpu
 sentence_transformers
-gradio
-gradio_client
+pdfminer
+unstructured
+pdf2image
+pdfminer-six
+opencv-python
+
+# FastAPI
 fastapi
 python-multipart
 aiofiles
 uvicorn[standard]
 gunicorn
 sacremoses
+
+# Chroma
+chromadb
+
+# Milvus
+protobuf
+grpcio-tools
+pymilvus
+
+# UI
+gradio
+gradio_client

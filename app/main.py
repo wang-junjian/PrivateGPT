@@ -71,26 +71,20 @@ templates = Jinja2Templates(directory="templates")
 import gradio as gr
 from app.ui.webui import main as webui_main
 
-title = f'<h1>{app.title}</h1> <a href="docs">SwaggerUI</a> <a href="redoc">ReDoc</a>'
-app = gr.mount_gradio_app(app, 
-                          webui_main(title), 
-                          path="/")
+# title = f'<h1>{app.title}</h1> <a href="docs">SwaggerUI</a> <a href="redoc">ReDoc</a>'
+title = f'<h1>{app.title}</h1> <a href="docs" target="_blank">SwaggerUI</a> <a href="redoc" target="_blank">ReDoc</a>'
+app = gr.mount_gradio_app(app, webui_main(title), path="/")
 
-qa = None
+
 @app.on_event('startup')
 def load_model():
     print('startup load_model')
 
-    from app.models.embedding import EmbeddingModel
-    from app.models.llm import LLM
+    # from app.models.embedding import EmbeddingModel
+    # from app.models.llm import LLM
 
-    embeddings = EmbeddingModel().load(config)
-    llm = LLM().load(config)
+    # EmbeddingModel().load(config)
+    # LLM().load(config)
 
-    vectorstore = VectorStore(config=config, embeddings=embeddings)
-    vectorstore.load()
-    global qa
-    qa = vectorstore.get_qa(llm)
-
-    from app.models.translate import TranslateModel
-    TranslateModel().load(config)
+    # from app.models.translate import TranslateModel
+    # TranslateModel().load(config)

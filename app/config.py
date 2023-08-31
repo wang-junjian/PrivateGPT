@@ -31,3 +31,9 @@ class Config:
         self.VECTORSTORE_PATH = os.environ.get("VECTORSTORE_PATH")
         self.TEXT_CHUNK_SIZE = int(os.environ.get("TEXT_CHUNK_SIZE"))
         self.TEXT_CHUNK_OVERLAP = int(os.environ.get("TEXT_CHUNK_OVERLAP"))
+
+        self.MILVUS_HOST = os.environ.get("MILVUS_HOST")
+        self.MILVUS_PORT = os.environ.get("MILVUS_PORT")
+        self.COLLECTION_NAME = os.environ.get("COLLECTION_NAME")
+
+        self.CLIP_MODEL = os.environ.get("CLIP_MODEL")
