@@ -1,0 +1,14 @@
+# 在构建 Docker 镜像时忽略所有目录下的 .DS_Store 文件。** 表示忽略所有目录
+**/.DS_Store
+
+venv
+env
+.git
+.gitignore
+tmp
+/data
+/storage
+
+build_dockerfile.sh
+Dockerfile
+.dockerignore

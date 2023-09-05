@@ -1,3 +1,5 @@
+import threading
+
 from fastapi import FastAPI, Request
 from fastapi.openapi.docs import (
     get_redoc_html,
@@ -8,12 +10,54 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.vectorstore import VectorStore
-from .config import Config
 from .routers import knowledgeqa
+
+from app.config import Config
+from app.models.llm import LLM
+from app.models.embedding import EmbeddingModel
+from app.models.search_image import SearchImageModel
+from app.vectorstore import VectorStore
+from app.embeddings.clip_embeddings import ClipEmbeddings
+from app.deduplication import FileDeduplication
+
+
+class GlobalObject:
+    _instance = None
+    _lock = threading.Lock()
+    
+    def __new__(cls):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    @staticmethod
+    def getInstance():
+        return GlobalObject()._instance
+    
+    def __init__(self):
+        self.config = Config()
+
+        self.llm = LLM().load(config)
+        self.embeddings = EmbeddingModel().load(config)
+
+        self.vs_docs = VectorStore.create_with_chroma_docs(config=config, embeddings=self.embeddings)
+        self.doc_qa = self.vs_docs.get_qa(llm=self.llm)
+
+        self.search_image_model = SearchImageModel()
+        self.search_image_model.load(config)
+
+        self.clip_embeddings = ClipEmbeddings(self.search_image_model)
+        self.vs_images = VectorStore.create_with_chroma_images(config=config, embeddings=self.clip_embeddings)
+
+        self.file_deduplication = FileDeduplication(config)
+
+
+global_object = None
 
 
 config = Config()
-
 app = FastAPI(title=config.TITLE, version=config.VERSION)
 # app = FastAPI(title=config.TITLE, version=config.VERSION, 
 #               docs_url=None, redoc_url=None)
@@ -33,6 +77,7 @@ env/lib/python3.10/site-packages/fastapi/openapi/docs.py
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+app.mount("/storage", StaticFiles(directory="storage"), name="storage")
 
 # @app.get("/docs", include_in_schema=False)
 # async def custom_swagger_ui_html():
@@ -78,13 +123,6 @@ app = gr.mount_gradio_app(app, webui_main(title), path="/")
 
 @app.on_event('startup')
 def load_model():
-    print('startup load_model')
-
-    # from app.models.embedding import EmbeddingModel
-    # from app.models.llm import LLM
-
-    # EmbeddingModel().load(config)
-    # LLM().load(config)
-
-    # from app.models.translate import TranslateModel
-    # TranslateModel().load(config)
+    print('Startup GlobalObject')
+    global global_object
+    global_object = GlobalObject.getInstance()

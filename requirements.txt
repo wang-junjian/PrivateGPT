@@ -1,13 +1,22 @@
 python-dotenv
 tiktoken
 openai
-langchain
+
 sentence_transformers
-pdfminer
-unstructured
-pdf2image
-pdfminer-six
+# pdfminer
+# pdf2image
+# pdfminer-six
+
 opencv-python
+Pillow
+
+langchain
+unstructured
+python-docx
+python-pptx
+pymupdf
+markdown
+pandoc      # EPUB is an e-book file format that uses the ".epub" file extension.
 
 # FastAPI
 fastapi
@@ -20,10 +29,12 @@ sacremoses
 # Chroma
 chromadb
 
-# Milvus
-protobuf
-grpcio-tools
-pymilvus
+# # Milvus
+# protobuf
+# grpcio-tools
+# pymilvus
+
+redis
 
 # UI
 gradio

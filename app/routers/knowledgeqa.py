@@ -2,7 +2,7 @@ import time
 from fastapi import APIRouter
 from app.base_model import KnowledgeQA, Document, Metadata
 
-from app import main
+from app import main as app_main
 
 
 router = APIRouter()
@@ -12,7 +12,7 @@ router = APIRouter()
 async def chat(prompt: str) -> KnowledgeQA:
     start_time = time.perf_counter()
 
-    result = main.qa({"query": prompt})
+    result = app_main.global_object.doc_qa({"query": prompt})
     content = result["result"]
 
     documents = []

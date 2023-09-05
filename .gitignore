@@ -1,6 +1,6 @@
 # Custom
 /data/
-/vectorstore/
+/storage/
 /models/
 /tmp/
 .DS_Store
