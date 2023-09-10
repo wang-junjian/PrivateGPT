@@ -15,8 +15,10 @@ class EmbeddingModel(Model):
             embeddings = OpenAIEmbeddings()
         else:
             from langchain.embeddings import HuggingFaceEmbeddings
+            encode_kwargs = {'normalize_embeddings': False}
             embeddings = HuggingFaceEmbeddings(model_name=config.EMBEDDING_MODEL_NAME, 
-                                               cache_folder=config.EMBEDDING_MODEL_CACHE_DIRECTORY)
+                                               cache_folder=config.EMBEDDING_MODEL_CACHE_DIRECTORY,
+                                               encode_kwargs=encode_kwargs)
                     
         print('load_embedding_model', config.EMBEDDING_MODEL_NAME, config.EMBEDDING_MODEL_CACHE_DIRECTORY)
 

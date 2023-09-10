@@ -47,7 +47,11 @@ class VectorStore:
         if ext_name in LOADER_MAPPING:
             loader_class, loader_kwargs = LOADER_MAPPING[ext_name]
             loader = loader_class(file_path, **loader_kwargs)
-            return loader.load()
+
+            if ext_name in ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.epub']:
+                return loader.load_and_split() # split into pages
+            else:
+                return loader.load()
         
         raise ValueError(f"Unsupported file extension '{ext_name}', file_path: {file_path}")
     
